@@ -43,13 +43,18 @@ for key in private_keys:
 
     time_sleep_txn = random.randint(TRANSACTION_DELAY_FROM, TRANSACTION_DELAY_TO)
     time.sleep(time_sleep_txn)
-    nonce = web3.eth.get_transaction_count(Account.from_key(private_key).address)
+    account = web3.eth.account.from_key(key)
+    account_addr = web3.to_checksum_address(account.address)
+    nonce = web3.eth.get_transaction_count(account_addr)
+
     transaction = contract.functions.mint().build_transaction({
         'chainId': 8453, #base
-        'gas': 70000,
         'gasPrice':  round(1.15*web3.eth.gas_price),
         'nonce': nonce,
+        'gas': 40000
     })
+
+    # estimated_gas = web3.eth.estimate_gas(transaction)
 
     signed_txn = web3.eth.account.sign_transaction(transaction, private_key=key)
 
